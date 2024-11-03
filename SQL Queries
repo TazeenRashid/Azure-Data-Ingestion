@@ -1,0 +1,30 @@
+--Lookup value query--
+
+SELECT 
+s.name AS SchemaName,
+t.Name AS TableName
+from sys.tables t
+INNER JOIN sys.schemas s 
+on t.schema_id = s.schema_id
+WHERE s.name = 'SalesLT'
+
+--For Each table source query -- 
+@{concat('select * FROM ', item().SchemaName,'.',item().TableName)}
+
+--For Each table Sink Parameters 
+@item().SchemaName
+@item().TableName
+
+--Parquet Sink File Path-- 
+@{concat(dataset().schemaname,'/',dataset().tablename)}
+@{concat(dataset().tablename,'.parquet')}
+
+
+--SQL SERVER------
+--Create Login -- 
+create login tazeen with password = '123456789'
+create user tazeen for login tazeen
+
+
+use AdventureWorksLT2022;
+grant select on schema::SalesLT to tazeen
